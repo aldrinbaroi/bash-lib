@@ -3,17 +3,26 @@
 # Bash logging library
 #
 
-readonly DEFAULT_LOG_DIR="${pwd}"
-readonly DEFAULT_LOG_FILE_NAME="app.log"
-readonly DEFAULT_LOG_TAG="APP-LOG"
+__initLoggingLibrary()
+{
+    if (( ${LOGGING_LIBRARY_INITIALIZED} )); then
+        return
+    fi
 
-LOG_DIR="${DEFAULT_LOG_DIR}"
-LOG_FILE_NAME="${DEFAULT_LOG_FILE_NAME}"
-LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
-LOG_TAG="${DEFAULT_LOG_TAG}"
+    LOGGING_LIBRARY_INITIALIZED=1
 
-LOGGING_ENABLED=0
-LOGGING_BACKUP=0
+    readonly DEFAULT_LOG_DIR="${pwd}"
+    readonly DEFAULT_LOG_FILE_NAME="app.log"
+    readonly DEFAULT_LOG_TAG="APP-LOG"
+
+    LOG_DIR="${DEFAULT_LOG_DIR}"
+    LOG_FILE_NAME="${DEFAULT_LOG_FILE_NAME}"
+    LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+    LOG_TAG="${DEFAULT_LOG_TAG}"
+
+    LOGGING_ENABLED=0
+    LOGGING_BACKUP=0
+}
 
 setLogDirectory()
 {
@@ -29,17 +38,17 @@ setLogFileName()
 
 setLogTag()
 {
-        LOG_TAG=$1
+    LOG_TAG=$1
 }
 
 enableLogging()
 {
-        LOGGING_ENABLED=1
+    LOGGING_ENABLED=1
 }
 
 disableLogging()
 {
-        LOGGING_ENABLED=0
+    LOGGING_ENABLED=0
 }
 
 enableLogBackup()
@@ -78,18 +87,20 @@ log()
 
 logPipe()
 {
-        while read message; do
-                Logging_log "${message}"
-        done
+    while read message; do
+        Logging_log "${message}"
+    done
 }
 
 abort()
 {
-        local msg=${1}
-        local exitCode=${2:-1} 
-        Logging_log "${1}"
-        Logging_log "Aborting..."
-        exit ${exitCode}
+    local msg=${1}
+    local exitCode=${2:-1} 
+    Logging_log "${1}"
+    Logging_log "Aborting..."
+    exit ${exitCode}
 }
+
+__initLoggingLibrary
 
 #::END::
