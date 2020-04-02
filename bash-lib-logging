@@ -1,0 +1,85 @@
+#!/bin/bash
+#
+# Bash logging library
+#
+
+readonly DEFAULT_LOG_DIR="${pwd}"
+readonly DEFAULT_LOG_FILE_NAME="app.log"
+readonly DEFAULT_LOG_TAG="APP-LOG"
+
+LOG_DIR="${DEFAULT_LOG_DIR}"
+LOG_FILE_NAME="${DEFAULT_LOG_FILE_NAME}"
+LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+LOG_TAG="${DEFAULT_LOG_TAG}"
+
+LOGGING_ENABLED=0
+LOGGING_BACKUP=0
+
+function Logging_setLogDirectory
+{
+    LOG_DIR=${1:-${LOG_DIR}}
+    LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+}
+
+function Logging_setLogFileName
+{
+    LOG_FILE_NAME=${1:-${LOG_FILE_NAME}}
+    LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+}
+
+function Logging_setLogTag
+{
+        LOG_TAG=$1
+}
+
+function Logging_enable
+{
+        LOGGING_ENABLED=1
+}
+
+function Logging_disable
+{
+        LOGGING_ENABLED=0
+}
+
+function Logging_newLogFile
+{
+    if (( ${LOGGING_ENABLED} )) && (( ${LOGGING_BACKUP} )); then
+        local backupLogFile="${LOG_FILE}-$(ls --full-time ${LOG_FILE} | awk '{ print $6"_"$7 }' | sed 's/[.].*$//')"
+        if (( $(cp ${LOG_FILE} ${backupLogFile} 2>&1; echo $?) )); then
+            echo "WARN: Failed to create backup of the previous log file"
+        fi
+    fi
+    if (( $(cat /dev/null > ${LOG_FILE} 2&1; echo $?) )); then
+        echo "Failed to create/clear the log file [${LOG_FILE}]"
+        echo "Exiting..."
+        exit 1
+    fi
+}
+
+function Logging_log
+{
+    if (( LOGGING_ENABLED )); then
+        echo -e "${1}" | tee -a ${LOG_FILE}
+    else
+        echo -e "${1}" 
+    fi
+}
+
+function Logging_logPipe
+{
+        while read message; do
+                Logging_log "${message}"
+        done
+}
+
+function abort
+{
+        local msg=${1}
+        local exitCode=${2:-1} 
+        Logging_log "${1}"
+        Logging_log "Aborting..."
+        exit ${exitCode}
+}
+
+#::END::
