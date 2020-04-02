@@ -15,34 +15,44 @@ LOG_TAG="${DEFAULT_LOG_TAG}"
 LOGGING_ENABLED=0
 LOGGING_BACKUP=0
 
-function Logging_setLogDirectory
+setLogDirectory()
 {
     LOG_DIR=${1:-${LOG_DIR}}
     LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
 }
 
-function Logging_setLogFileName
+setLogFileName()
 {
     LOG_FILE_NAME=${1:-${LOG_FILE_NAME}}
     LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
 }
 
-function Logging_setLogTag
+setLogTag()
 {
         LOG_TAG=$1
 }
 
-function Logging_enable
+enableLogging()
 {
         LOGGING_ENABLED=1
 }
 
-function Logging_disable
+disableLogging()
 {
         LOGGING_ENABLED=0
 }
 
-function Logging_newLogFile
+enableLogBackup()
+{
+    LOGGING_BACKUP=1
+}
+
+disableLogBackup()
+{
+   LOGGING_BACKUP=0 
+}
+
+newLogFile()
 {
     if (( ${LOGGING_ENABLED} )) && (( ${LOGGING_BACKUP} )); then
         local backupLogFile="${LOG_FILE}-$(ls --full-time ${LOG_FILE} | awk '{ print $6"_"$7 }' | sed 's/[.].*$//')"
@@ -57,7 +67,7 @@ function Logging_newLogFile
     fi
 }
 
-function Logging_log
+log()
 {
     if (( LOGGING_ENABLED )); then
         echo -e "${1}" | tee -a ${LOG_FILE}
@@ -66,14 +76,14 @@ function Logging_log
     fi
 }
 
-function Logging_logPipe
+logPipe()
 {
         while read message; do
                 Logging_log "${message}"
         done
 }
 
-function abort
+abort()
 {
         local msg=${1}
         local exitCode=${2:-1} 
