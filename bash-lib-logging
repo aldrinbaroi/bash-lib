@@ -88,7 +88,7 @@ log()
 logPipe()
 {
     while read message; do
-        Logging_log "${message}"
+        log "${message}"
     done
 }
 
@@ -96,8 +96,8 @@ abort()
 {
     local msg=${1}
     local exitCode=${2:-1} 
-    Logging_log "${1}"
-    Logging_log "Aborting..."
+    log "${1}"
+    log "Aborting..."
     exit ${exitCode}
 }
 
