@@ -9,12 +9,7 @@ source lib/bash-lib-logging
 
 __initMiscLibrary()
 {
-	readonly CURRENT_USER=$(whoami)
-	if [ "$CURRENT_USER" != "root" ]; then
-		readonly SUDO="sudo"
-	else
-		readonly SUDO=""
-	fi
+
 }
 
 push_dir() 
