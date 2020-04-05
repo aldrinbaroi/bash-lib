@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+#  User related functions
+#
+
+__initUserLibrary()
+{
+	readonly CURRENT_USER=$(whoami)
+	if [ "$CURRENT_USER" != "root" ]; then
+		readonly SUDO="sudo"
+	else
+		readonly SUDO=""
+	fi
+}
+
+getPassword()
+{
+    local prompt1=${1:-"Please enter password"}
+    local prompt2=${2:-"Please re-enter password"}
+    local retryMessage=${3:-"Passwords do not match. Retry (y/n)"}
+    local password1 
+    local password2
+    local retry
+    while : ; do
+        read -sp "${prompt1}: " password1
+		echo "" > /dev/tty
+        read -sp "${prompt2}: " password2
+		echo "" > /dev/tty
+        if [ "${password1}" == "${password2}" ]; then
+			echo ${password1}
+			break
+		else
+			while : ; do
+				read -p "${retryMessage}: " -n1 retry
+				retry=${retry,,}
+				if [ "${retry}" == "y" ]; then
+					break
+				elif [ "${retry}" == "n" ]; then
+					echo "" > /dev/tty
+					return 1
+				fi
+				echo "" > /dev/tty
+			done
+        fi
+    done
+}
+
+
+__initUserLibrary
+
+#::END::
+
