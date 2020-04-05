@@ -1,0 +1,160 @@
+#!/bin/bash
+#
+# Misc bash utility functions
+#
+# Dependency: bash-lib-logging
+#
+
+source lib/bash-lib-logging
+
+__initMiscLibrary()
+{
+	readonly CURRENT_USER=$(whoami)
+	if [ "$CURRENT_USER" != "root" ]; then
+		readonly SUDO="sudo"
+	else
+		readonly SUDO=""
+	fi
+}
+
+push_dir() 
+{
+	local directoryName=${1}
+	if [ -z "${directoryName}" ]; then
+		abort "Direcotry name not provide."
+	fi
+	if [ ! -d "${directoryName}" ]; then
+		abort "Direcotry doesn't exist."
+	fi
+	pushd ${directoryName} > /dev/null 2>&1
+	if (( $? )); then
+		abort "Failed to push directory [${directoryName}] on to stack."
+	fi
+}
+
+pop_dir()
+{
+	popd > /dev/null 2>&1
+	if (( $? )); then
+		abort "Possible coding error."
+	fi
+}
+
+
+
+createDirectory()
+{
+	local directoryName=${1}
+	if [ -z "${directoryName}" ]; then
+		abort "Direcotry name not provide."
+	fi
+	if [ ! -d "${directoryName}" ]; then
+		mkdir -p ${directoryName}
+		if (( $? )); then
+			abort "Failed to create directory [${directoryName}]"
+		fi
+	fi
+}
+
+clearDirectory()
+{
+	local directoryName=${1}
+	if [ -z "${directoryName}" ]; then
+		abort "Direcotry name not provide."
+	fi
+	if [ ! -d "${directoryName}" ]; then
+		abort "Direcotry doesn't exist."
+	fi
+	if [ -d "${directoryName}" ]; then
+		if [ ! -z "$(ls -A ${WRK_DIR})" ]; then
+			log "Work directory is not empty.  Clearing it..."
+			push_dir ${directoryName} 
+			rm -rf ./*
+			local error=${?}
+			pop_dir 
+			if (( ${error} )); then
+				abort "Failed to clear directory [${directoryName}]"
+			fi
+		fi	
+	else
+		createDirectory ${directoryName}
+	fi	
+}
+
+mountIso()
+{
+	local isoFile=${1}
+	local mountPoint=${2}
+	if [ -z "${isoFile}" ]; then
+		abort "ISO file name not provide."
+	fi
+	if [ ! -f "${isoFile}" ]; then
+		abort "ISO file [${isoFile}] doesn't exist."
+	fi
+	if [ -z "${mountPoint}" ]; then
+		abort "Mount point name not provide."
+	fi
+	if [ ! -d "${mountPoint}" ]; then
+		abort "Mount point [${mountPoint}] doesn't exist."
+	fi
+	${SUDO} mount -v -t iso9660 -o loop ${isoFile} ${mountPoint} > /dev/null 2>&1
+	if (( $? )); then
+		abort "Failed to mount [${isoFile}] to mount point [${mountPoint}]"
+	fi
+}
+
+isMounted()
+{
+	local mountPoint=${1}
+	if [ -z "${mountPoint}" ]; then
+		abort "Mount point name not provide."
+	fi
+	if (( $(mountpoint -q ${mountPoint}) )); then
+		echo 0
+	else
+		echo 1
+	fi
+
+}
+
+unmount()
+{
+	local mountPoint=${1}
+	if [ -z "${mountPoint}" ]; then
+		abort "Mount point name not provide."
+	fi
+	if (( ! $(mountpoint -q ${mountPoint}; echo $?) )); then
+		${SUDO} umount ${mountPoint} > /dev/null 2>&1
+		if (( $? )); then
+			abort "Failed to unmount mount point [${mountPoint}]"
+		fi
+	fi
+}
+
+#
+# NOTE: doesn't work right...
+#
+getFullPath()
+{
+	local file=${1}
+	local fullPath=""
+	if [ -z "${file}" ]; then
+		abort "Fire/directory name not provide."
+	fi	
+	if [ -d "${file}" ]; then
+		pushd "${file}" > /dev/null
+		fullPath=$(pwd)
+		popd
+	elif [ -f "${file}" ]; then
+		pushd "$(dirname ${file})" > /dev/null
+		fullPath="$(pwd)/$(basename ${file})"
+		popd
+	else
+		abort "File/directory [${file}] doesn't exist."
+	fi
+	echo "${fullPath}"
+}
+
+__initMiscLibrary
+
+#::END::
