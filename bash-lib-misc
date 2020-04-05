@@ -9,7 +9,7 @@ source lib/bash-lib-logging
 
 __initMiscLibrary()
 {
-
+	: # noop
 }
 
 push_dir() 
