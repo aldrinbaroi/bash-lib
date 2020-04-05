@@ -6,11 +6,22 @@
 __initUserLibrary()
 {
 	readonly CURRENT_USER=$(whoami)
+	readonly CURRENT_USER_GROUP=$(id -gn)
 	if [ "$CURRENT_USER" != "root" ]; then
 		readonly SUDO="sudo"
 	else
 		readonly SUDO=""
 	fi
+}
+
+getCurrentUser()
+{
+	echo ${CURRENT_USER}
+}
+
+getCurrentUserGroup()
+{
+	echo ${CURRENT_USER_GROUP}
 }
 
 getPassword()
