@@ -34,6 +34,7 @@ getPassword()
 				read -p "${retryMessage}: " -n1 retry
 				retry=${retry,,}
 				if [ "${retry}" == "y" ]; then
+					echo "" > /dev/tty
 					break
 				elif [ "${retry}" == "n" ]; then
 					echo "" > /dev/tty
