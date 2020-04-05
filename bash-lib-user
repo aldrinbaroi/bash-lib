@@ -2,6 +2,8 @@
 #
 #  User related functions
 #
+#  Dependency: bash-lib-logging
+#
 
 __initUserLibrary()
 {
@@ -22,6 +24,21 @@ getCurrentUser()
 getCurrentUserGroup()
 {
 	echo ${CURRENT_USER_GROUP}
+}
+
+isValidUser()
+{
+        local user=$1
+	local status
+	if [ -z "${user}" ]; then
+		abort "Use ID not provide."
+	fi
+        id -u ${user} > /dev/null 2>&1
+        if (( $? )); then
+                echo 0
+        else
+                echo 1
+        fi
 }
 
 getPassword()
