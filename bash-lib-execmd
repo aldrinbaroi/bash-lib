@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# Bash command exection library with error logging
+#
+# Dependency: bash-lib-logging
+#
+
+source lib/bash-lib-logging
+
+function exeCmd
+{
+        local cmd=$1
+        local errorMsg=$2
+        local successMsg=$3 
+        set -e
+        set -o pipefail 
+        if [ -z "${cmd}" ]; then
+                abort "(exeCmd): command not provided"
+        else
+                if [ -z "${errorMsg}" ]; then
+                        errorMsg="Error: Command execution failed. Command: [${cmd//\"/\\\"}]"
+                else
+                        errorMsg="${errorMsg//\"/\\\"}"
+                fi
+                if [ -z "${successMsg}" ]; then
+                        successMsg=""
+                else
+                        successMsg="${successMsg//\"/\\\"}"
+                fi
+                local _CMD="${cmd}; 
+                                if (( \$? )); then 
+                                        echo \"${errorMsg}\";
+                                        echo 'Aborting...';
+                                        exit 1;
+                                else
+                                        if [ ! -z \"${successMsg}\" ]; then
+                                                echo \"${successMsg}\";
+                                        fi;
+                                fi"
+                bash -c "${_CMD}" 2>&1 | logPipe
+        fi
+        set +o pipefail 
+        set +e
+}
+
+function exeCmd_asUser
+{
+        local user=${1}
+        local cmd=${2}
+        local errorMsg=${3}
+        local successMsg=${4}
+        if [ -z "${user}" ]; then
+                abort "(exeCmd_asUser): user name not provided"
+        fi
+        if [ -z "${cmd}" ]; then
+                abort "(exeCmd_asUser): command not provided"
+        else
+                local _CMD="runuser -l ${user} -c '${cmd}'"
+                exeCmd "${_CMD}" "${errorMsg}" "${successMsg}"
+        fi
+}
+
+#::END::
