@@ -1,2 +1,2 @@
-# bash-lib-log
-Bash logging library
+# bash-lib
+Bash library
