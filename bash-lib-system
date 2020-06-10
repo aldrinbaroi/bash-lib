@@ -106,6 +106,7 @@ disableSwap()
 			else
 				echo 1
 			fi
+		fi
 	else
 		echo 1
         fi 
