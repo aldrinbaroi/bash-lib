@@ -15,6 +15,7 @@ __initSystemLibrary()
 	case "${OSTYPE}" in
 		linux*)
 			_OS_TYPE="linux"
+			;;
 		solaris*)
 			_OS_TYPE="solaris"
 			;;
