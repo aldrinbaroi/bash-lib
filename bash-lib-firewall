@@ -54,7 +54,7 @@ enableFirewall()
 
 disableFirewall()
 {
-	if (( $(systemctl disable -q "${FIREWALL_SVC}" && systemctl mask --now "${FIREWALL_SVC}") )); then
+	if (( $(systemctl disable -q "${FIREWALL_SVC}" && systemctl mask -q --now "${FIREWALL_SVC}") )); then
 		echo 0
 	else
 		echo 1
