@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+# Bash system library
+#
+# Currently supports: 
+#    Ubuntu
+#    CentOS (Redhat)
+# 
+
+__initSystemLibrary()
+{
+	local _OS_TYPE=""
+	local _LINUX_DISTRO=""
+	local _PKG_MANAGER=""
+	case "${OSTYPE}" in
+		linux*)
+			_OS_TYPE="linux"
+		solaris*)
+			_OS_TYPE="solaris"
+			;;
+		darwin*)
+			_OS_TYPE="darwin"
+			;;
+		*)
+			_OS_TYPE="${OSTYPE}"
+			;;
+	esac 
+	_LINUX_DISTRO=$(hostnamectl | grep "Operating System" | awk '{print $3}')
+	if (( $? )); then
+		_LINUX_DISTRO=$(cat /etc/os-release | grep "^NAME" | sed -e 's/"//g' -e 's/NAME=//' | awk '{print $1}')
+		if (( $? )); then
+			_LINUX_DISTRO=$(cat /etc/lsb-release | grep "DISTRIB_ID" | sed -e 's/DISTRIB_ID=//')
+			if (( $? )); then
+				_LINUX_DISTRO=$(cat /etc/redhat-release | grep "^NAME" | sed -e 's/"//g' -e 's/NAME=//' | awk '{print $1}')
+			fi 
+		fi 
+	fi 
+	_LINUX_DISTRO="${_LINUX_DISTRO,,}"
+	case "${_LINUX_DISTRO}" in
+		ubuntu)
+			_PKG_MANAGER="apt-get"
+			;;
+		centos|redhat)
+			_PKG_MANAGER="yum"
+			;; 
+	esac
+	readonly OS_TYPE="${_OS_TYPE}"
+	readonly LINUX_DISTRO="${_LINUX_DISTRO}"
+	readonly PACKAGE_MANAGER="${_PKG_MANAGER}"
+}
+
+getOSType()
+{
+	echo "${OS_TYPE}"
+}
+
+getDistroType()
+{
+	echo "${LINUX_DISTRO}"
+} 
+
+packageManager()
+{ 
+	${PACKAGE_MANAGER} "${@}"
+}
+
+__initSystemLibrary
+
+#::END::

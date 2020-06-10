@@ -1,0 +1,84 @@
+#!/bin/bash
+#
+# Bash system library
+#
+# Depends on bash-lib-system
+#
+# Currently supports:
+#     Ubuntu
+#     CentOS (Redhat)
+#
+
+source lib/bash-lib-system 
+
+__initFirewallLibrary()
+{
+	local _FIREWALL_SVC=""
+	case "$(getDistroType)" in 
+		ubuntu)
+			_FIREWALL_SVC="ufw"
+			;;
+		centos|redhat)
+			_FIREWALL_SVC="firewalld"
+			;;
+	esac 
+	readonly FIREWALL_SVC="${_FIREWALL_SVC}"
+}
+
+isFirewallEnabled()
+{
+	if (( $(systemctl is-enable -q "${FIREWALL_SVC}") )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+isFirewallActive()
+{
+	if (( $(systemctl is-active -q "${FIREWALL_SVC}") )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+enableFirewall()
+{
+	if (( $(systemctl enable -q "${FIREWALL_SVC}") )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+disableFirewall()
+{
+	if (( $(systemctl disable -q "${FIREWALL_SVC}") )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+startFirewall()
+{
+	if (( $(systemctl start -q "${FIREWALL_SVC}") )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+stopFirewall()
+{
+	if (( $(systemctl stop -q "${FIREWALL_SVC}") )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+__initFirewallLibrary
+
+#::END::
