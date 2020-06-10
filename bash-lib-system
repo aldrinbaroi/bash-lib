@@ -67,7 +67,11 @@ getDistroType()
 packageManagerInstall()
 {
 	${PACKAGE_MANAGER} install -y "${@}"
-	echo $?
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
 }
 
 packageManagerUpdate()
@@ -79,12 +83,20 @@ packageManagerUpdate()
 				echo 0
 			else
 				${PACKAGE_MANAGER} upgrade -y "${@}"
-				echo $?
+				if (( $? )); then
+					echo 0
+				else
+					echo 1
+				fi
 			fi
 			;;
 		centos|redhat)
 			${PACKAGE_MANAGER} update -y "${@}"
-			echo $?
+			if (( $? )); then
+				echo 0
+			else
+				echo 1
+			fi
 			;;
 	esac
 }
