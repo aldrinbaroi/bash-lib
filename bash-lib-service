@@ -133,7 +133,7 @@ areAllServicesEnabled()
 	local areAllServicesEnabled_=1
 	local disabledServicesList=""
 	for service in ${servicesList//,/ }; do
-		if (( ! $(is_service_enabled ${service}) )); then
+		if (( ! $(isServiceEnabled ${service}) )); then
 			areAllServicesEnabled_=0
 			disabledServicesList="${disabledServicesList} ${service}"
 		fi
