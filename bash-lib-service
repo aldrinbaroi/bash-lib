@@ -8,155 +8,216 @@
 # Dependency: bash-lib-logging
 #
 
+__initServiceLibrary()
+{
+}
+
 isServiceExist()
 {
-    local service=${1}
-    if [ ! -z ${service} ]; then
-        if (( $(systemctl list-units --full --all 2> /dev/null | grep -Fq "${service}"; echo $?) == 0 )); then
-            echo 1
-        else
-            echo 0
-        fi
-    else
-        abort "[isServiceExist]: Service name not provided"
-    fi
+	local service=${1}
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl list-units --full --all 2> /dev/null | grep -Fq "${service}"; echo $?) == 0 )); then
+			 echo 1
+		else
+			echo 0
+		fi
+	else
+		abort "[isServiceExist]: Service name not provided"
+	fi
 }
 
 isServiceEnabled()
 {
-    local service=$1
-    if [ ! -z ${service} ]; then
-        if (( $(systemctl is-enabled -q ${service} > /dev/null 2>&1; echo $?) == 0 )); then
-            echo 1
-        else
-            echo 0
-        fi
-    else
-        abort "[isServiceEnabled]: Service name not provided"
-    fi
+	local service=$1
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl is-enabled -q ${service} > /dev/null 2>&1; echo $?) == 0 )); then
+			echo 1
+		else
+			echo 0
+		fi
+	else
+		abort "[isServiceEnabled]: Service name not provided"
+	fi
 }
 
 isServiceActive()
 {
-    local service=$1
-    if [ ! -z ${service} ]; then
-        if (( $(systemctl is-active -q ${service} > /dev/null 2>&1; echo $?) == 0 )); then
-            echo 1
-        else
-            echo 0
-        fi
-    else
-        abort "[isServiceActive]: Service name not provided"
-    fi
+	local service=$1
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl is-active -q ${service} > /dev/null 2>&1; echo $?) == 0 )); then
+			echo 1
+		else
+			echo 0
+		fi
+	else
+		abort "[isServiceActive]: Service name not provided"
+	fi
 }
+
+enableService()
+{
+	local service=${1}
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl enable -q "${service}") )); then
+			echo 0
+		else
+			echo 1
+		fi
+	else
+		abort "[enableService]: Service name not provided"
+	fi
+}
+
+disableService()
+{
+	local service=${1}
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl disable -q "${service}" && systemctl mask -q --now "${service}") )); then
+			echo 0
+		else
+			echo 1
+		fi
+	else
+		abort "[disableService]: Service name not provided"
+	fi
+}
+
+startService()
+{
+	local service=${1}
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl start -q "${service}") )); then
+			echo 0
+		else
+			echo 1
+		fi
+	else
+		abort "[startService]: Service name not provided"
+	fi
+}
+
+stopService()
+{
+	local service=${1}
+	if [ ! -z ${service} ]; then
+		if (( $(systemctl stop -q "${service}") )); then
+			echo 0
+		else
+			echo 1
+		fi
+	else
+		abort "[stopService]: Service name not provided"
+	fi
+} 
 
 areAllServicesExist()
 {
-    local servicesList=$1
-    local areAllServicesExist_=1
-    local nonExistentServiceList=""
-    for service in ${servicesList//,/ }; do
-        if (( ! $(isServiceExist ${service}) )); then
-            areAllServicesExist_=0
-            nonExistentServiceList="${nonExistentServiceList} ${service}"
-        fi
-    done
-    echo ${nonExistentServiceList}
-    if (( ! ${areAllServicesExist_} )); then
-        return -1
-    fi
-}
-
+	local servicesList=$1
+	local areAllServicesExist_=1
+	local nonExistentServiceList=""
+	for service in ${servicesList//,/ }; do
+		if (( ! $(isServiceExist ${service}) )); then
+			areAllServicesExist_=0
+			nonExistentServiceList="${nonExistentServiceList} ${service}"
+		fi
+	done
+	echo ${nonExistentServiceList}
+	if (( ! ${areAllServicesExist_} )); then
+		return -1
+	fi
+} 
 
 areAllServicesEnabled()
 {
-    local servicesList=$1
-    local areAllServicesEnabled_=1
-    local disabledServicesList=""
-    for service in ${servicesList//,/ }; do
-        if (( ! $(is_service_enabled ${service}) )); then
-            areAllServicesEnabled_=0
-            disabledServicesList="${disabledServicesList} ${service}"
-        fi
-    done
-    echo ${disabledServicesList}
-    if (( ! ${areAllServicesEnabled_} )); then
-        return -1
-    fi
+	local servicesList=$1
+	local areAllServicesEnabled_=1
+	local disabledServicesList=""
+	for service in ${servicesList//,/ }; do
+		if (( ! $(is_service_enabled ${service}) )); then
+			areAllServicesEnabled_=0
+			disabledServicesList="${disabledServicesList} ${service}"
+		fi
+	done
+	echo ${disabledServicesList}
+	if (( ! ${areAllServicesEnabled_} )); then
+		return -1
+	fi
 }
 
 areAllServicesActive()
 {
-    local servicesList=$1
-    local areAllServicesActive_=1
-    local inactiveServicesList=""
-    for service in ${servicesList//,/ }; do
-        if (( ! $(isServiceActive ${service}) )); then
-            areAllServicesActive_=0
-            inactiveServicesList="${inactiveServicesList} ${service}"
-        fi
-    done
-    echo ${inactiveServicesList}
-    if (( ! ${areAllServicesActive_} )); then
-        return -1
-    fi
+	local servicesList=$1
+	local areAllServicesActive_=1
+	local inactiveServicesList=""
+	for service in ${servicesList//,/ }; do
+		if (( ! $(isServiceActive ${service}) )); then
+			areAllServicesActive_=0
+			inactiveServicesList="${inactiveServicesList} ${service}"
+		fi
+	done
+	echo ${inactiveServicesList}
+	if (( ! ${areAllServicesActive_} )); then
+		return -1
+	fi
 }
 
 waitForServiceToBeActive()
 {
-    local service=$1
-    local maxCheckCount=$2
-    local checkInterval=$3
-    for checkCount in $(seq 1 ${maxCheckCount}); do
-        if (( ! $(isServiceActive ${service}) )); then
-            log "Wating ${checkInterval} seconds for ${service} to become active..."
-            sleep ${checkInterval}
-        fi
-    done
-    if (( ! $(isServiceActive ${service}) )); then
-        return -1
-    fi
+	local service=$1
+	local maxCheckCount=$2
+	local checkInterval=$3
+	for checkCount in $(seq 1 ${maxCheckCount}); do
+		if (( ! $(isServiceActive ${service}) )); then
+			log "Wating ${checkInterval} seconds for ${service} to become active..."
+			sleep ${checkInterval}
+		fi
+	done
+	if (( ! $(isServiceActive ${service}) )); then
+		return -1
+	fi
 }
 
 waitForListOfServicesToBeActive()
 {
-    local waitForServicesList=$1
-    local nonExistentServicesList
-    local disabledServicesList
-    local inactiveServicesList
-    local callStatus
+	local waitForServicesList=$1
+	local nonExistentServicesList
+	local disabledServicesList
+	local inactiveServicesList
+	local callStatus
 
-    nonExistentServicesList=$(areAllServicesExist "${waitForServicesList}")
-    callStatus=$?
-    if (( ${callStatus} )); then
-        log "Not all services exist. Non-existent services: ${nonExistentServicesList}"
-        return -1
-    fi
-    disabledServicesList=$(areAllServicesEnable "${waitForServicesList}")
-    callStatus=$?
-    if (( ${callStatus} )); then
-        log "Not all services enabled. Services not enabled: ${disabledServicesList}"
-        return -1
-    fi
-    inactiveServicesList=$(areAllServicesActive "${waitForServicesList}")
-    callStatus=$?
-    if (( ${callStatus} )); then
-        log "Not all services yet active. Services not yet active: ${inactiveServicesList}"
-        log "Waiting for dependency services to become active"
-        for waitForService in ${inactiveServicesList//,/ } ; do
-            if (( ! $(isServiceActive ${waitForService}) )); then
-                log "${waitForService} is not active."
-                waitForServiceToBeActive ${waitForService}
-                callStatus=$?
-                if (( ${callStatus} )); then
-                    log "Not all dependency services are still active."
-                    return -1
-                else
-                    log "Dependency service [${waitForService}] is now active."
-                fi
-            fi
-        done
-    fi
+	nonExistentServicesList=$(areAllServicesExist "${waitForServicesList}")
+	callStatus=$?
+	if (( ${callStatus} )); then
+		log "Not all services exist. Non-existent services: ${nonExistentServicesList}"
+		return -1
+	fi
+	disabledServicesList=$(areAllServicesEnable "${waitForServicesList}")
+	callStatus=$?
+	if (( ${callStatus} )); then
+		log "Not all services enabled. Services not enabled: ${disabledServicesList}"
+		return -1
+	fi
+	inactiveServicesList=$(areAllServicesActive "${waitForServicesList}")
+	callStatus=$?
+	if (( ${callStatus} )); then
+		log "Not all services yet active. Services not yet active: ${inactiveServicesList}"
+		log "Waiting for dependency services to become active"
+		for waitForService in ${inactiveServicesList//,/ } ; do
+			if (( ! $(isServiceActive ${waitForService}) )); then
+				log "${waitForService} is not active."
+				waitForServiceToBeActive ${waitForService}
+				callStatus=$?
+				if (( ${callStatus} )); then
+					log "Not all dependency services are still active."
+					return -1
+				else
+					log "Dependency service [${waitForService}] is now active."
+				fi
+			fi
+		done
+	fi
 }
+
+__initServiceLibrary
 
 #::END::
