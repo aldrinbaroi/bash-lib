@@ -159,6 +159,22 @@ isSwapEnabled()
 	fi 
 }
 
+disableSwap()
+{
+	if (( $(isSwapEnabled) )); then
+		if (( $(sed -i /swap/s/^/#/ /etc/fstab) )); then
+			echo 0
+		else
+			if (( $(swapoff -a) )); then
+				echo 0
+			else
+				echo 1
+			fi
+	else
+		echo 1
+	fi 
+}
+
 __initMiscLibrary
 
 #::END::
