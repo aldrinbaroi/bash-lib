@@ -115,6 +115,18 @@ addUser()
 	fi 
 } 
 
+getUserHome()
+{
+	local _USER_ID=${1}
+	if [ -z "${_USER_ID}" ]; then
+		abort "User ID is not provided"
+	fi
+	if (( ! $(isValidUser "${_USER_ID}") )); then
+		abort "Invalid user id ${_USER_ID}"
+	fi
+	echo "$(getent passwd ${_USER_ID} | awk 'BEGIN {FS=":"}; {print $6}')" 
+}
+
 __initUserLibrary
 
 #::END::
