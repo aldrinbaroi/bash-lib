@@ -86,6 +86,80 @@ packageManagerUpdate()
 	esac
 }
 
+isSwapEnabled()
+{
+	if (( $(swapon --show | wc -l) > 1 )); then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+disableSwap()
+{
+	if (( $(isSwapEnabled) )); then
+		if (( $(sed -i '/swap/s/^/#/' /etc/fstab) )); then
+			echo 0
+		else
+			if (( $(swapoff -a) )); then
+				echo 0
+			else
+				echo 1
+			fi
+	else
+		echo 1
+        fi 
+}
+
+mountIso()
+{
+	local isoFile=${1}
+	local mountPoint=${2}
+	if [ -z "${isoFile}" ]; then
+		abort "ISO file name not provide."
+	fi
+	if [ ! -f "${isoFile}" ]; then
+		abort "ISO file [${isoFile}] doesn't exist."
+	fi
+	if [ -z "${mountPoint}" ]; then
+		abort "Mount point name not provide."
+	fi
+	if [ ! -d "${mountPoint}" ]; then
+		abort "Mount point [${mountPoint}] doesn't exist."
+	fi
+	SUDO mount -v -t iso9660 -o loop ${isoFile} ${mountPoint} > /dev/null 2>&1
+	if (( $? )); then
+		abort "Failed to mount [${isoFile}] to mount point [${mountPoint}]"
+	fi
+}
+
+isMounted()
+{
+	local mountPoint=${1}
+	if [ -z "${mountPoint}" ]; then
+		abort "Mount point name not provide."
+	fi
+	if (( $(mountpoint -q ${mountPoint}) )); then
+		echo 0
+	else
+		echo 1
+	fi 
+}
+
+unmount()
+{
+	local mountPoint=${1}
+	if [ -z "${mountPoint}" ]; then
+		abort "Mount point name not provide."
+	fi
+	if (( ! $(mountpoint -q ${mountPoint}; echo $?) )); then
+		${SUDO} umount ${mountPoint} > /dev/null 2>&1
+		if (( $? )); then
+			abort "Failed to unmount mount point [${mountPoint}]"
+		fi
+	fi
+} 
+
 __initSystemLibrary
 
 #::END::
