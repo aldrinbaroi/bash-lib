@@ -87,7 +87,7 @@ setSelinuxPermissive()
 #
 setSelinuxDisabled()
 {
-	if (( $(isSelinuxPermissive) )); then
+	if (( $(isSelinuxDisabled) )); then
 		echo 1
 	else
 		if (( $(sed -i s/^SELINUX=.*/SELINUX=disabled/ /etc/selinux/config) )); then
