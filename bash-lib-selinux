@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Bash SELinux library
+#
+
+isSelinuxEnabled()
+{
+	local status=$(getenforce)
+	status=${status,,}
+	if [[ "${status}" == "enforcing" || "${status}" == "permissive" ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+isSelinuxDisabled()
+{
+	local status=$(getenforce)
+	status=${status,,}
+	if [[ "${status}" == "disabled" ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+isSelinuxEnforcing()
+{
+	local status=$(getenforce)
+	status=${status,,}
+	if [[ "${status}" == "enforcing" ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+isSelinuxPermissive()
+{
+	local status=$(getenforce)
+	status=${status,,}
+	if [[ "${status}" == "permissive" ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+setSelinuxEnforcing()
+{
+	if (( $(isSelinuxEnforcing) )); then
+		echo 1
+	else
+		if (( $(sed -i s/^SELINUX=.*/SELINUX=enforcing/ /etc/selinux/config) )); then
+			echo 0
+		else
+			if (( $(setenforce 1) )); then
+				echo 0
+			else
+				echo 1
+			fi
+		fi
+	fi
+}
+
+setSelinuxPermissive()
+{
+	if (( $(isSelinuxPermissive) )); then
+		echo 1
+	else
+		if (( $(sed -i s/^SELINUX=.*/SELINUX=permissive/ /etc/selinux/config) )); then
+			echo 0
+		else
+			if (( $(setenforce 0) )); then
+				echo 0
+			else
+				echo 1
+			fi
+		fi
+	fi
+}
+
+#
+# NOTE: Require reboot to take effect
+#       There is no way to disable SELinux without reboot
+#
+setSelinuxDisabled()
+{
+	if (( $(isSelinuxPermissive) )); then
+		echo 1
+	else
+		if (( $(sed -i s/^SELINUX=.*/SELINUX=disabled/ /etc/selinux/config) )); then
+			echo 0
+		else
+			echo 1
+		fi
+	fi
+}
+
+#::END::
