@@ -7,26 +7,30 @@
 
 __initUserLibrary()
 {
-	readonly CURRENT_USER=$(whoami)
-	readonly CURRENT_USER_GROUP=$(id -gn)
-	if [ "$CURRENT_USER" != "root" ]; then
-		readonly SUDO="sudo"
-	else
-		readonly SUDO=""
-	fi
 }
 
 getCurrentUser()
 {
-	echo ${CURRENT_USER}
+	echo "$(whoami)"
 }
 
 getCurrentUserGroup()
 {
-	echo ${CURRENT_USER_GROUP}
+	echo "$(id -gn)"
 }
 
-isValidUser()
+SUDO()
+{
+	local _SUDO=""
+	if [[ "$(whoami)" == "root" ]]; then
+		_SUDO=""	
+	else
+		_SUDO="sudo "	
+	fi
+	${_SUDO} "${@}"
+}
+
+isUserExist()
 {
         local user=$1
 	local status
@@ -39,6 +43,16 @@ isValidUser()
         else
                 echo 1
         fi
+}
+
+isValidUser()
+{
+	local _USER=$1
+	if (( $(isUserExist "${_USER}") )); then
+		echo 1
+	else
+		echo 0
+	fi
 }
 
 getPassword()
@@ -74,6 +88,32 @@ getPassword()
     done
 }
 
+addUser()
+{
+	local _USER_ID=${1}
+	local _PSSSWORD=${2}
+	if [ -z "${_USER_ID}" ]; then
+		abort "User ID is not provided"
+	fi
+	if [ -z "${_PASSWORD}" ]; then
+		abort "Password is not provided"
+	fi
+	if (( $(id -u ${_USER_ID} > /dev/null 2>&1; echo $?) )); then
+		log "${_USER_ID} user doesn't exist.  Adding the user"
+		local encpw=$(openssl passwd -crypt ${_PASSWORD})
+		if (( $? )); then
+			abort "Failed to generate encrypted passwd using openssl"
+		else
+			if (( $(useradd -m -p ${encpw} ${_USER_ID}; echo $?) )); then
+				abort "Failed to add admin user"
+			else
+				log "Added user ${_USER_ID} successfully."
+			fi
+		fi
+	else
+		log "[${_USER_ID} already user exist."
+	fi 
+} 
 
 __initUserLibrary
 
