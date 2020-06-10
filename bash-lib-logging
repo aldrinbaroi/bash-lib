@@ -63,10 +63,12 @@ disableLogBackup()
 
 newLogFile()
 {
-    if (( ${LOGGING_ENABLED} )) && (( ${LOGGING_BACKUP} )); then
-        local backupLogFile="${LOG_FILE}-$(ls --full-time ${LOG_FILE} | awk '{ print $6"_"$7 }' | sed 's/[.].*$//')"
-        if (( $(cp ${LOG_FILE} ${backupLogFile} 2>&1; echo $?) )); then
-            echo "WARN: Failed to create backup of the previous log file"
+    if [ -f "${LOG_FILE}" ]; then
+        if (( ${LOGGING_ENABLED} )) && (( ${LOGGING_BACKUP} )); then
+            local backupLogFile="${LOG_FILE}-$(ls --full-time ${LOG_FILE} | awk '{ print $6"_"$7 }' | sed 's/[.].*$//')"
+            if (( $(cp ${LOG_FILE} ${backupLogFile} 2>&1; echo $?) )); then
+                echo "WARN: Failed to create backup of the previous log file"
+            fi
         fi
     fi
     if (( $(cat /dev/null > ${LOG_FILE} 2&1; echo $?) )); then
