@@ -14,7 +14,7 @@ __initLoggingLibrary()
 
 	LOG_DIR="${DEFAULT_LOG_DIR}"
 	LOG_FILE_NAME="${DEFAULT_LOG_FILE_NAME}"
-	LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+	LOG_FILE="${LOG_DIR}/${LOG_FILE_NAME}"
 	LOG_TAG="${DEFAULT_LOG_TAG}"
 
 	LOGGING_ENABLED=0
@@ -24,13 +24,13 @@ __initLoggingLibrary()
 setLogDirectory()
 {
 	LOG_DIR=${1:-${LOG_DIR}}
-	LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+	LOG_FILE="${LOG_DIR}/${LOG_FILE_NAME}"
 }
 
 setLogFileName()
 {
 	LOG_FILE_NAME=${1:-${LOG_FILE_NAME}}
-	LOG_FILE="${LOG_DIR}/{${LOG_FILE_NAME}"
+	LOG_FILE="${LOG_DIR}/${LOG_FILE_NAME}"
 }
 
 setLogTag()
