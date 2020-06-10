@@ -9,6 +9,9 @@
 
 __initSystemLibrary()
 {
+	(( ${__SYSTEM_LIB_INITIALIZED__} )) && return
+	readonly __SYSTEM_LIB_INITIALIZED__=1
+
 	local _OS_TYPE=""
 	local _LINUX_DISTRO=""
 	local _PKG_MANAGER=""

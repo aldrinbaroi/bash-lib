@@ -3,6 +3,12 @@
 # Bash SELinux library
 #
 
+__initSelinuxLib() 
+{
+	(( ${__SELINUX_LIB_INITIALIZED__} )) && return
+	readonly __SELINUX_LIB_INITIALIZED__=1 
+}
+
 isSelinuxEnabled()
 {
 	local status=$(getenforce)
@@ -97,5 +103,7 @@ setSelinuxDisabled()
 		fi
 	fi
 }
+
+__initSelinuxLib
 
 #::END::

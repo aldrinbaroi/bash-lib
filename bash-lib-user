@@ -7,7 +7,8 @@
 
 __initUserLibrary()
 {
-	:
+	(( ${__USER_LIB_INITIALIZED__} )) && return
+	readonly __USER_LIB_INITIALIZED__=1
 }
 
 getCurrentUser()

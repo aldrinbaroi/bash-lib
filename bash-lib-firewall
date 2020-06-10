@@ -13,6 +13,9 @@ source lib/bash-lib-system
 
 __initFirewallLibrary()
 {
+	(( ${__FIREWALL_LIB_INITIALIZED__} )) && return
+	readonly __FIREWALL_LIB_INITIALIZED__=1
+
 	local _FIREWALL_SVC=""
 	case "$(getDistroType)" in 
 		ubuntu)

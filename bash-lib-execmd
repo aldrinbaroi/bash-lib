@@ -7,8 +7,15 @@
 
 source lib/bash-lib-logging
 
-function exeCmd
+__initExeCmdLibrary()
 {
+	(( ${__EXECMD_LIB_INITIALIZED__} )) && return
+	readonly __EXECMD_LIB_INITIALIZED__=1
+}
+
+exeCmd()
+{
+
         local cmd=$1
         local errorMsg=$2
         local successMsg=$3 
@@ -43,7 +50,7 @@ function exeCmd
         set +e
 }
 
-function exeCmd_asUser
+exeCmd_asUser()
 {
         local user=${1}
         local cmd=${2}
@@ -59,5 +66,7 @@ function exeCmd_asUser
                 exeCmd "${_CMD}" "${errorMsg}" "${successMsg}"
         fi
 }
+
+__initExeCmdLibrary
 
 #::END::

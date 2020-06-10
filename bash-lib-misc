@@ -9,7 +9,8 @@ source lib/bash-lib-logging
 
 __initMiscLibrary()
 {
-	: # noop
+	(( ${__MISC_LIB_INITIALIZED__} )) && return
+	readonly __MISC_LIB_INITIALIZED__=1 
 }
 
 push_dir() 
