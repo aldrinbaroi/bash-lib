@@ -63,25 +63,28 @@ getDistroType()
 	echo "${LINUX_DISTRO}"
 } 
 
-__packageManager()
-{ 
-	${PACKAGE_MANAGER} "${@}"
-}
 
 packageManagerInstall()
 {
-	__packageManager install -y "${@}" 
+	${PACKAGE_MANAGER} install -y "${@}"
+	echo $?
 }
 
 packageManagerUpdate()
 {
 	case "$(getDistroType)" in
 		ubuntu)
-			__packageManager update
-			__packageManager upgrade -y "${@}"
+			${PACKAGE_MANAGER} update
+			if (( $? )); then
+				echo 0
+			else
+				${PACKAGE_MANAGER} upgrade -y "${@}"
+				echo $?
+			fi
 			;;
 		centos|redhat)
-			__packageManager update -y "${@}"
+			${PACKAGE_MANAGER} update -y "${@}"
+			echo $?
 			;;
 	esac
 }
