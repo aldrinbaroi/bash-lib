@@ -68,7 +68,7 @@ newLogFile()
 			fi
 		fi
 	fi
-	if (( $(cat /dev/null > ${LOG_FILE} 2&1; echo $?) )); then
+	if (( $(cat /dev/null > ${LOG_FILE} 2>&1; echo $?) )); then
 		echo "Failed to create/clear the log file [${LOG_FILE}]"
 		echo "Exiting..."
 		exit 1
