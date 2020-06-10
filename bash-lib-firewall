@@ -30,7 +30,7 @@ __initFirewallLibrary()
 
 isFirewallEnabled()
 {
-	if (( $(systemctl is-enable -q "${FIREWALL_SVC}") )); then
+	if (( $(systemctl is-enabled -q "${FIREWALL_SVC}") )); then
 		echo 0
 	else
 		echo 1
