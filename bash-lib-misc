@@ -150,6 +150,15 @@ getFullPath()
 	echo "${fullPath}"
 }
 
+isSwapEnabled()
+{
+	if (( $(swapon --show | wc -l) > 1 )); then
+		echo 1
+	else
+		echo 0
+	fi 
+}
+
 __initMiscLibrary
 
 #::END::
