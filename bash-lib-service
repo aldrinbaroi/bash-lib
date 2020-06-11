@@ -63,7 +63,11 @@ enableService()
 		if (( $(systemctl enable -q "${service}") )); then
 			echo 0
 		else
-			echo 1
+			if (( $(isServiceEnabled "${service}") )); then
+				echo 1
+			else
+				echo 0
+			fi
 		fi
 	else
 		abort "[enableService]: Service name not provided"
@@ -77,7 +81,11 @@ disableService()
 		if (( $(systemctl disable -q "${service}" && systemctl mask -q --now "${service}") )); then
 			echo 0
 		else
-			echo 1
+			if (( $(isServiceEnabled "${service}") )); then
+				echo 0
+			else
+				echo 1
+			fi
 		fi
 	else
 		abort "[disableService]: Service name not provided"
