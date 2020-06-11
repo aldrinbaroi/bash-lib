@@ -113,10 +113,10 @@ isSwapEnabled()
 disableSwap()
 {
 	if (( $(isSwapEnabled) )); then
-		if (( $(sed -i '/swap/s/^/#/' /etc/fstab) )); then
+		if (( $(swapoff -a) )); then
 			echo 0
 		else
-			if (( $(swapoff -a) )); then
+			if (( $(sed -i '/swap/s/^/#/' /etc/fstab) )); then
 				echo 0
 			else
 				echo 1
