@@ -163,6 +163,23 @@ areAllServicesActive()
 	fi
 }
 
+areAllServicesInactive()
+{
+	local servicesList=$1
+	local areAllServicesInactive_=1
+	local activeServicesList=""
+	for service in ${servicesList//,/ }; do
+		if (( $(isServiceActive ${service}) )); then
+			areAllServicesInactive_=0
+			activeServicesList="${activeServicesList} ${service}"
+		fi
+	done
+	echo ${activeServicesList}
+	if (( ! ${areAllServicesInactive_} )); then
+		return -1
+	fi
+}
+
 waitForServiceToBeActive()
 {
 	local service=$1
@@ -203,17 +220,74 @@ waitForListOfServicesToBeActive()
 	callStatus=$?
 	if (( ${callStatus} )); then
 		log "Not all services yet active. Services not yet active: ${inactiveServicesList}"
-		log "Waiting for dependency services to become active"
+		log "Waiting for services to become active"
 		for waitForService in ${inactiveServicesList//,/ } ; do
 			if (( ! $(isServiceActive ${waitForService}) )); then
 				log "${waitForService} is not active."
 				waitForServiceToBeActive ${waitForService}
 				callStatus=$?
 				if (( ${callStatus} )); then
-					log "Not all dependency services are still active."
+					log "Not all services are yet active."
 					return -1
 				else
-					log "Dependency service [${waitForService}] is now active."
+					log "[${waitForService}] service is now active."
+				fi
+			fi
+		done
+	fi
+}
+
+waitForServiceToBeInactive()
+{
+	local service=$1
+	local maxCheckCount=$2
+	local checkInterval=$3
+	for checkCount in $(seq 1 ${maxCheckCount}); do
+		if (( $(isServiceActive ${service}) )); then
+			log "Wating ${checkInterval} seconds for ${service} to become inactive..."
+			sleep ${checkInterval}
+		fi
+	done
+	if (( $(isServiceActive ${service}) )); then
+		return -1
+	fi
+}
+
+waitForListOfServicesToBeInactive()
+{
+	local waitForServicesList=$1
+	local nonExistentServicesList
+	local disabledServicesList
+	local activeServicesList
+	local callStatus
+
+	nonExistentServicesList=$(areAllServicesExist "${waitForServicesList}")
+	callStatus=$?
+	if (( ${callStatus} )); then
+		log "Not all services exist. Non-existent services: ${nonExistentServicesList}"
+		return -1
+	fi
+	disabledServicesList=$(areAllServicesEnable "${waitForServicesList}")
+	callStatus=$?
+	if (( ${callStatus} )); then
+		log "Not all services enabled. Services not enabled: ${disabledServicesList}"
+		return -1
+	fi
+	activeServicesList=$(areAllServicesActive "${waitForServicesList}")
+	callStatus=$?
+	if (( ${callStatus} )); then
+		log "Not all services yet inactive. Services not yet inactive: ${activeServicesList}"
+		log "Waiting for services to become inactive"
+		for waitForService in ${activeServicesList//,/ } ; do
+			if (( $(isServiceActive ${waitForService}) )); then
+				log "${waitForService} is not inactive."
+				waitForServiceToBeInactive ${waitForService}
+				callStatus=$?
+				if (( ${callStatus} )); then
+					log "Not all services are yet inactive."
+					return -1
+				else
+					log "[${waitForService}] service is now inactive."
 				fi
 			fi
 		done
