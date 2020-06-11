@@ -116,7 +116,7 @@ addUser()
 			fi
 		fi
 	else
-		echo 0
+		echo 1
 		return 5 # user already exist."
 	fi 
 } 
