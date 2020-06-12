@@ -1,0 +1,174 @@
+#!/bin/bash
+#
+# Bash package manager library
+#
+# Currently supports: 
+#    Ubuntu
+#    CentOS (Redhat)
+#
+# Depends on:
+#   1. bash-lib-logging
+#   2. bash-lib-system
+#   3. bash-lib-execmd
+# 
+
+__initPackageManagerLibrary()
+{
+	(( ${__PKG_MANAGER_LIB_INITIALIZED__} )) && return
+	readonly __PKG_MANAGER_LIB_INITIALIZED__=1
+
+	local _PKG_MANAGER=""
+	local _PKG_INSTALL_CMD=""
+	local _PKG_REINSTALL_CMD=""
+	local _PKG_UPDATE_CMD=""
+	local _PKG_UNINSTALL_CMD="" 
+	local _PKG_LOCK_MANAGER=""
+	local _PKG_VERSION_LOCK_CMD=""
+	local _PKG_VERSION_UNLOCK_CMD=""
+
+	case "$(getOSType)" in
+		ubuntu)
+			_PKG_MANAGER="apt-get"
+			_PKG_INSTALL_CMD="apt-get install -y"
+			_PKG_REINSTALL_CMD="apt-get reinstall -y"
+			_PKG_UPDATE_CMD="apt-get update; apt-get upgrade -y"
+			_PKG_UNINSTALL_CMD="apt-get purge -y"
+			_PKG_LOCK_MANAGER="apt-mark"
+			_PKG_VERSION_LOCK_CMD="apt-mark hold"
+			_PKG_VERSION_UNLOCK_CMD="apt-mark unhold"
+			;;
+		centos|redhat)
+			_PKG_MANAGER="yum"
+			_PKG_INSTALL_CMD="yum install -y"
+			_PKG_REINSTALL_CMD="yum reinstall -y"
+			_PKG_UPDATE_CMD="yum update -y"
+			_PKG_UNINSTALL_CMD="yum erase -y"
+			_PKG_LOCK_MANAGER="yum"
+			_PKG_VERSION_LOCK_CMD="yum versionlock add"
+			_PKG_VERSION_UNLOCK_CMD="yum versionlock delete"
+			;; 
+	esac
+	readonly OS_TYPE="${_OS_TYPE}"
+	readonly LINUX_DISTRO="${_LINUX_DISTRO}"
+	readonly PKG_MANAGER="${_PKG_MANAGER}" 
+	readonly PKG_INSTALL_CMD="${_PKG_INSTALL_CMD}"
+	readonly PKG_REINSTALL_CMD="${_PKG_REINSTALL_CMD}"
+	readonly PKG_UPDATE_CMD="${_PKG_UPDATE_CMD}"
+	readonly PKG_UNINSTALL_CMD="${_PKG_UNINSTALL_CMD}"
+	readonly PKG_LOCK_MANAGER="${_PKG_LOCK_MANAGER}"
+	readonly PKG_VERSION_LOCK_CMD="${_PKG_VERSION_LOCK_CMD}"
+	readonly PKG_VERSION_UNLOCK_CMD="${_PKG_VERSION_UNLOCK_CMD}"
+
+}
+
+packageManager_install()
+{
+	${PKG_INSTALL_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_reinstall()
+{
+	${PKG_REINSTALL_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_update()
+{
+	${PKG_UPDATE_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_uninstall()
+{
+	${PKG_UNINSTALL_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_lockVersion()
+{
+	${PKG_VERSION_LOCK_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_unlockVersion()
+{
+	${PKG_VERSION_UNLOCK_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+function packageManager_install_ext
+{
+        local packages="${@}"
+        exeFunc "packageManager_install ${packages}" \
+                "Error: Failed to install the packages: ${packages}" \
+                "Successfully installed the packages: ${packages}"
+}
+
+function packageManager_reinstall_ext
+{
+        local packages="${@}"
+        exeFunc "packageManager_reinstall ${packages}" \
+                "Error: Failed to reinstall the packages: ${packages}" \
+                "Successfully reinstalled the packages: ${packages}"
+}
+
+function packageManager_update_ext
+{
+        local packages="${@}" 
+        exeFunc "packageManager_update ${packages}" \
+                "Error: Failed to update installed packages" \
+                "Successfully updated packages"
+} 
+
+function packageManager_uninstall_ext
+{
+        local packages="${@}"
+        exeFunc "packageManager_uninstall ${packages}" \
+                "Error: Failed to uninstall the packages: ${packages}" \
+                "Successfully uninstalled the packages: ${packages}"
+}
+
+function packageManager__lockVersion_ext
+{
+        local packages="${@}"
+        exeFunc "packageManager_lockVersion ${packages}" \
+                "Error: Failed to version lock the packages: ${packages}" \
+                "Successfully version locked the packages: ${packages}"
+}
+
+function packageManager__unlockVersion_ext
+{
+        local packages="${@}"
+        exeFunc "packageManager_unlockVersion ${packages}" \
+                "Error: Failed to version unlock the packages: ${packages}" \
+                "Successfully version unlocked the packages: ${packages}"
+} 
+
+__initPackageManagerLibrary
+
+#::END::
