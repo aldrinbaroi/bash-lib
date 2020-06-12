@@ -5,6 +5,8 @@
 #  Dependency: bash-lib-logging
 #
 
+source lib/bash-lib-logging
+
 __initUserLibrary()
 {
 	(( ${__USER_LIB_INITIALIZED__} )) && return

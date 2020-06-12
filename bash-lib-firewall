@@ -2,13 +2,14 @@
 #
 # Bash system library
 #
-# Depends on bash-lib-system
+# Depends on bash-lib-system 
 #
 # Currently supports:
 #     Ubuntu
 #     CentOS (Redhat)
 #
 
+source lib/bash-lib-loggin
 source lib/bash-lib-system 
 
 __initFirewallLibrary()

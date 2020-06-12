@@ -12,6 +12,10 @@
 #   3. bash-lib-execmd
 # 
 
+source lib/bash-lib-logging
+source lib/bash-lib-system
+source lib/bash-lib-execmd
+
 __initPackageManagerLibrary()
 {
 	(( ${__PKG_MANAGER_LIB_INITIALIZED__} )) && return
