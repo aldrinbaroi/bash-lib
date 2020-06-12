@@ -67,6 +67,28 @@ exeCmd_asUser()
         fi
 }
 
+#
+# NOTE: Called function must return
+#       >= 1 to indicate success or 
+#          0 to indicate failure
+#       Otherwise this function will fail
+#
+exeFunc()
+{
+        local func=$1
+        local errorMsg=$2
+        local successMsg=$3
+        if (( $(${func}) )); then
+                if [ ! -z "${successMsg}" ]; then
+                        log "${successMsg}"
+                fi
+        else
+                if [ ! -z "${errorMsg}" ]; then
+                        abort "${errorMsg}"
+                fi
+        fi
+} 
+
 __initExeCmdLibrary
 
 #::END::
