@@ -55,6 +55,17 @@ getDistroType()
 	echo "${LINUX_DISTRO}"
 } 
 
+SUDO()
+{
+	local _SUDO=""
+	if [[ "$(whoami)" == "root" ]]; then
+		_SUDO=""
+	else
+		_SUDO="sudo"
+	fi
+	${_SUDO} "${@}"
+}
+
 isSwapEnabled()
 {
 	if (( $(swapon --show | wc -l) > 1 )); then

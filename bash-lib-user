@@ -23,17 +23,6 @@ getCurrentUserGroup()
 	echo "$(id -gn)"
 }
 
-SUDO()
-{
-	local _SUDO=""
-	if [[ "$(whoami)" == "root" ]]; then
-		_SUDO=""	
-	else
-		_SUDO="sudo "	
-	fi
-	${_SUDO} "${@}"
-}
-
 isUserExist()
 {
         local user=$1
