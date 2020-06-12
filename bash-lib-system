@@ -13,8 +13,16 @@ __initSystemLibrary()
 	readonly __SYSTEM_LIB_INITIALIZED__=1
 
 	local _OS_TYPE=""
-	local _LINUX_DISTRO=""
+	local _LINUX_DISTRO="" 
 	local _PKG_MANAGER=""
+	local _PKG_INSTALL_CMD=""
+	local _PKG_REINSTALL_CMD=""
+	local _PKG_UPDATE_CMD=""
+	local _PKG_UNINSTALL_CMD="" 
+	local _PKG_LOCK_MANAGER=""
+	local _PKG_VERSION_LOCK_CMD=""
+	local _PKG_VERSION_UNLOCK_CMD=""
+
 	case "${OSTYPE}" in
 		linux*)
 			_OS_TYPE="linux"
@@ -43,14 +51,36 @@ __initSystemLibrary()
 	case "${_LINUX_DISTRO}" in
 		ubuntu)
 			_PKG_MANAGER="apt-get"
+			_PKG_INSTALL_CMD="apt-get install -y"
+			_PKG_REINSTALL_CMD="apt-get reinstall -y"
+			_PKG_UPDATE_CMD="apt-get update; apt-get upgrade -y"
+			_PKG_UNINSTALL_CMD="apt-get purge -y"
+			_PKG_LOCK_MANAGER="apt-mark"
+			_PKG_VERSION_LOCK_CMD="apt-mark hold"
+			_PKG_VERSION_UNLOCK_CMD="apt-mark unhold"
 			;;
 		centos|redhat)
 			_PKG_MANAGER="yum"
+			_PKG_INSTALL_CMD="yum install -y"
+			_PKG_REINSTALL_CMD="yum reinstall -y"
+			_PKG_UPDATE_CMD="yum update -y"
+			_PKG_UNINSTALL_CMD="yum erase -y"
+			_PKG_LOCK_MANAGER="yum"
+			_PKG_VERSION_LOCK_CMD="yum versionlock add"
+			_PKG_VERSION_UNLOCK_CMD="yum versionlock delete"
 			;; 
 	esac
 	readonly OS_TYPE="${_OS_TYPE}"
 	readonly LINUX_DISTRO="${_LINUX_DISTRO}"
-	readonly PACKAGE_MANAGER="${_PKG_MANAGER}"
+	readonly PKG_MANAGER="${_PKG_MANAGER}" 
+	readonly PKG_INSTALL_CMD="${_PKG_INSTALL_CMD}"
+	readonly PKG_REINSTALL_CMD="${_PKG_REINSTALL_CMD}"
+	readonly PKG_UPDATE_CMD="${_PKG_UPDATE_CMD}"
+	readonly PKG_UNINSTALL_CMD="${_PKG_UNINSTALL_CMD}"
+	readonly PKG_LOCK_MANAGER="${_PKG_LOCK_MANAGER}"
+	readonly PKG_VERSION_LOCK_CMD="${_PKG_VERSION_LOCK_CMD}"
+	readonly PKG_VERSION_UNLOCK_CMD="${_PKG_VERSION_UNLOCK_CMD}"
+
 }
 
 getOSType()
@@ -64,9 +94,9 @@ getDistroType()
 } 
 
 
-packageManagerInstall()
+packageManager_install()
 {
-	${PACKAGE_MANAGER} install -y ${@} > /dev/null 2>&1
+	${PKG_INSTALL_CMD} ${@} > /dev/null 2>&1
 	if (( $? )); then
 		echo 0
 	else
@@ -74,31 +104,54 @@ packageManagerInstall()
 	fi
 }
 
-packageManagerUpdate()
+packageManager_reinstall()
 {
-	case "$(getDistroType)" in
-		ubuntu)
-			${PACKAGE_MANAGER} update > /dev/null 2>&1
-			if (( $? )); then
-				echo 0
-			else
-				${PACKAGE_MANAGER} upgrade -y ${@} > /dev/null 2>&1
-				if (( $? )); then
-					echo 0
-				else
-					echo 1
-				fi
-			fi
-			;;
-		centos|redhat)
-			${PACKAGE_MANAGER} update -y ${@} > /dev/null 2>&1
-			if (( $? )); then
-				echo 0
-			else
-				echo 1
-			fi
-			;;
-	esac
+	${PKG_REINSTALL_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_update()
+{
+	${PKG_UPDATE_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_uninstall()
+{
+	${PKG_UNINSTALL_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_lockVersion()
+{
+	${PKG_VERSION_LOCK_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+packageManager_unlockVersion()
+{
+	${PKG_VERSION_UNLOCK_CMD} ${@} > /dev/null 2>&1
+	if (( $? )); then
+		echo 0
+	else
+		echo 1
+	fi
 }
 
 isSwapEnabled()
