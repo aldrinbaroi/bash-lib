@@ -31,7 +31,7 @@ __initPackageManagerLibrary()
 			_PKG_MANAGER="apt-get"
 			_PKG_INSTALL_CMD="apt-get install -y"
 			_PKG_REINSTALL_CMD="apt-get reinstall -y"
-			_PKG_UPDATE_CMD="apt-get update; apt-get upgrade -y"
+			_PKG_UPDATE_CMD="apt-get update && apt-get upgrade -y"
 			_PKG_UNINSTALL_CMD="apt-get purge -y"
 			_PKG_LOCK_MANAGER="apt-mark"
 			_PKG_VERSION_LOCK_CMD="apt-mark hold"
