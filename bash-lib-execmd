@@ -87,7 +87,7 @@ exeFunc()
                 fi
         else
                 if [ -z "${errorMsg}" ]; then
-			log "ERROR: Failed to execute function: ${func}"
+			abort "ERROR: Failed to execute function: ${func}"
 		else
                         abort "${errorMsg}"
                 fi
