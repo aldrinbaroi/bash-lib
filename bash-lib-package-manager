@@ -48,8 +48,6 @@ __initPackageManagerLibrary()
 			_PKG_VERSION_UNLOCK_CMD="yum versionlock delete"
 			;; 
 	esac
-	readonly OS_TYPE="${_OS_TYPE}"
-	readonly LINUX_DISTRO="${_LINUX_DISTRO}"
 	readonly PKG_MANAGER="${_PKG_MANAGER}" 
 	readonly PKG_INSTALL_CMD="${_PKG_INSTALL_CMD}"
 	readonly PKG_REINSTALL_CMD="${_PKG_REINSTALL_CMD}"
@@ -57,8 +55,7 @@ __initPackageManagerLibrary()
 	readonly PKG_UNINSTALL_CMD="${_PKG_UNINSTALL_CMD}"
 	readonly PKG_LOCK_MANAGER="${_PKG_LOCK_MANAGER}"
 	readonly PKG_VERSION_LOCK_CMD="${_PKG_VERSION_LOCK_CMD}"
-	readonly PKG_VERSION_UNLOCK_CMD="${_PKG_VERSION_UNLOCK_CMD}"
-
+	readonly PKG_VERSION_UNLOCK_CMD="${_PKG_VERSION_UNLOCK_CMD}" 
 }
 
 packageManager_install()
