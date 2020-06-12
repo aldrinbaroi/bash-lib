@@ -78,12 +78,17 @@ exeFunc()
         local func=$1
         local errorMsg=$2
         local successMsg=$3
+        if [ -z "${func}" ]; then
+                abort "(exeFunc): Function name not provided"
+        fi
         if (( $(${func}) )); then
                 if [ ! -z "${successMsg}" ]; then
                         log "${successMsg}"
                 fi
         else
-                if [ ! -z "${errorMsg}" ]; then
+                if [ -z "${errorMsg}" ]; then
+			log "ERROR: Failed to execute function: ${func}"
+		else
                         abort "${errorMsg}"
                 fi
         fi
