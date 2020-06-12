@@ -9,7 +9,7 @@
 #     CentOS (Redhat)
 #
 
-source lib/bash-lib-loggin
+source lib/bash-lib-logging
 source lib/bash-lib-system 
 
 __initFirewallLibrary()
