@@ -10,6 +10,9 @@
 #   1. bash-lib-logging
 #   2. bash-lib-system
 #   3. bash-lib-execmd
+#
+#
+# WARNING: Contains unsafe code in packageManger_update
 # 
 
 source lib/bash-lib-logging
@@ -35,7 +38,7 @@ __initPackageManagerLibrary()
 			_PKG_MANAGER="apt-get"
 			_PKG_INSTALL_CMD="apt-get install -y"
 			_PKG_REINSTALL_CMD="apt-get reinstall -y"
-			_PKG_UPDATE_CMD="apt-get update && apt-get upgrade -y"
+			_PKG_UPDATE_CMD="apt-get update > /dev/null 2>&1 && apt-get upgrade -y"
 			_PKG_UNINSTALL_CMD="apt-get purge -y"
 			_PKG_LOCK_MANAGER="apt-mark"
 			_PKG_VERSION_LOCK_CMD="apt-mark hold"
@@ -82,9 +85,12 @@ packageManager_reinstall()
 	fi
 }
 
+#
+# WARNING: Use of "eval" make this function unsafe
+#
 packageManager_update()
 {
-	${PKG_UPDATE_CMD} ${@} > /dev/null 2>&1
+	eval "${PKG_UPDATE_CMD} ${@} > /dev/null 2>&1"
 	if (( $? )); then
 		echo 0
 	else
