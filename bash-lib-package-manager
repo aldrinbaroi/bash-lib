@@ -30,7 +30,7 @@ __initPackageManagerLibrary()
 	local _PKG_VERSION_LOCK_CMD=""
 	local _PKG_VERSION_UNLOCK_CMD=""
 
-	case "$(getOSType)" in
+	case "$(getDistroType)" in
 		ubuntu)
 			_PKG_MANAGER="apt-get"
 			_PKG_INSTALL_CMD="apt-get install -y"
