@@ -62,7 +62,7 @@ clearDirectory()
 		abort "Direcotry doesn't exist."
 	fi
 	if [ -d "${directoryName}" ]; then
-		if [ ! -z "$(ls -A ${WRK_DIR})" ]; then
+		if (( $(ls -A ${WRK_DIR} | wc -l) > 0 )); then
 			log "Work directory is not empty.  Clearing it..."
 			push_dir ${directoryName} 
 			rm -rf ./*
