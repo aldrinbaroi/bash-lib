@@ -63,7 +63,7 @@ SUDO()
 	else
 		_SUDO="sudo"
 	fi
-	${_SUDO} "${@}"
+	echo ${_SUDO}
 }
 
 isSwapEnabled()
@@ -108,7 +108,7 @@ mountIso()
 	if [ ! -d "${mountPoint}" ]; then
 		abort "Mount point [${mountPoint}] doesn't exist."
 	fi
-	SUDO mount -v -t iso9660 -o loop ${isoFile} ${mountPoint} > /dev/null 2>&1
+	$(SUDO) mount -v -t iso9660 -o loop ${isoFile} ${mountPoint} > /dev/null 2>&1
 	if (( $? )); then
 		abort "Failed to mount [${isoFile}] to mount point [${mountPoint}]"
 	fi
@@ -134,7 +134,7 @@ unmount()
 		abort "Mount point name not provide."
 	fi
 	if (( ! $(mountpoint -q ${mountPoint}; echo $?) )); then
-		SUDO umount ${mountPoint} > /dev/null 2>&1
+		$(SUDO) umount ${mountPoint} > /dev/null 2>&1
 		if (( $? )); then
 			abort "Failed to unmount mount point [${mountPoint}]"
 		fi
