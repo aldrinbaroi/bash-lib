@@ -94,6 +94,19 @@ exeFunc()
         fi
 } 
 
+isFunction()
+{
+	local func=$1
+	if [ -z "${func}" ]; then
+		abort "Function name not provided"
+	fi
+	if (( $(LC_ALL=C type -t ${func}) )); then
+		echo 0
+	else
+		echo 1
+	fi
+} 
+
 __initExeCmdLibrary
 
 #::END::
